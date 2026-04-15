@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Estadio Mundo 4 - Portales de Energía</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+
+    <script>
+      window.puntos1 = 0;
+      window.puntos2 = 0;
+
+      AFRAME.registerComponent('sistema-basket', {
+        init: function () {
+          this.el.addEventListener('triggerdown', () => {
+            const sceneEl = document.querySelector('a-scene');
+            const worldPos = new THREE.Vector3();
+            this.el.object3D.getWorldPosition(worldPos);
+
+            const bola = document.createElement('a-sphere');
+            bola.setAttribute('position', worldPos);
+            bola.setAttribute('radius', '0.4'); // Pelotas más grandes para canastas grandes
+            bola.setAttribute('color', '#FF8C00');
+            sceneEl.appendChild(bola);
+
+            // Detección (ajustada a la nueva altura de 10m)
+            const pos1 = new THREE.Vector3(0, 10, -25);
+            const pos2 = new THREE.Vector3(0, 10, 25);
+
+            if (worldPos.distanceTo(pos1) < 6) {
+              window.puntos1++;
+              document.getElementById('puntos-1').setAttribute('value', window.puntos1);
+            }
+            if (worldPos.distanceTo(pos2) < 6) {
+              window.puntos2++;
+              document.getElementById('puntos-2').setAttribute('value', window.puntos2);
+            }
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="estadio" src="estadio.glb"></a-asset-item>
+      </a-assets>
+
+      <a-sky color="#4CC3FF"></a-sky>
+      <a-light type="ambient" intensity="1.2"></a-light>
+
+      <a-entity gltf-model="#estadio" position="0 0 0"></a-entity>
+
+      <a-entity position="0 10 -25">
+        <a-torus radius="4" radius-tubular="0.15" color="#FF0000"></a-torus>
+        <a-box position="0 5 0" width="6" height="3" color="white">
+          <a-text id="puntos-1" value="0" color="black" align="center" width="25" position="0 0 0.5"></a-text>
+        </a-box>
+      </a-entity>
+
+      <a-entity position="0 10 25" rotation="0 180 0">
+        <a-torus radius="4" radius-tubular="0.15" color="#FF0000"></a-torus>
+        <a-box position="0 5 0" width="6" height="3" color="white">
+          <a-text id="puntos-2" value="0" color="black" align="center" width="25" position="0 0 0.5"></a-text>
+        </a-box>
+      </a-entity>
+
+      <a-entity position="-15 2 0" onclick="window.location.href='mundo3.html'">
+        <a-circle radius="2" color="#FF1493" material="opacity: 0.6; transparent: true; side: double"></a-circle>
+        <a-text value="REGRESAR" align="center" position="0 0 0.1" width="6"></a-text>
+      </a-entity>
+
+      <a-entity position="15 2 0" onclick="window.location.href='mundo5.html'">
+        <a-circle radius="2" color="#00FFFF" material="opacity: 0.6; transparent: true; side: double"></a-circle>
+        <a-text value="MUNDO 5" align="center" position="0 0 0.1" width="6"></a-text>
+      </a-entity>
+
+      <a-entity id="rig" movement-controls="fly: true; speed: 0.4" wasd-controls="fly: true; acceleration: 60">
+        <a-entity camera position="0 1.6 0" look-controls>
+          <a-cursor color="#000" radius="0.01"></a-cursor>
+        </a-entity>
+        <a-entity oculus-touch-controls="hand: left"></a-entity>
+        <a-entity oculus-touch-controls="hand: right" sistema-basket></a-entity>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
