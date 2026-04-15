@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Estadio Final - MOVIMIENTO LIBERADO</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+
+    <script>
+      window.puntosCian = 0;
+      window.puntosRosa = 0;
+
+      AFRAME.registerComponent('sistema-basket', {
+        init: function () {
+          this.el.addEventListener('triggerdown', () => {
+            const sceneEl = document.querySelector('a-scene');
+            const worldPos = new THREE.Vector3();
+            this.el.object3D.getWorldPosition(worldPos);
+
+            const bola = document.createElement('a-sphere');
+            bola.setAttribute('position', worldPos);
+            bola.setAttribute('radius', '0.3');
+            bola.setAttribute('color', '#FF0000');
+            sceneEl.appendChild(bola);
+
+            const pos1 = new THREE.Vector3(0, 8, -30);
+            const pos2 = new THREE.Vector3(0, 8, 30);
+            if (worldPos.distanceTo(pos1) < 5) {
+              window.puntosCian++;
+              document.getElementById('txt-v-1').setAttribute('value', window.puntosCian);
+            }
+            if (worldPos.distanceTo(pos2) < 5) {
+              window.puntosRosa++;
+              document.getElementById('txt-v-2').setAttribute('value', window.puntosRosa);
+            }
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="estadio-modelo" src="estadio.glb"></a-asset-item>
+      </a-assets>
+
+      <a-sky color="#4CC3FF"></a-sky>
+      <a-light type="ambient" intensity="1.2"></a-light>
+
+      <a-entity gltf-model="#estadio-modelo"></a-entity>
+
+      <a-entity position="0 8 -30">
+        <a-torus radius="4" radius-tubular="0.2" color="#FF0000" rotation="-20 0 0"></a-torus>
+        <a-box position="0 6 0" width="3" height="2" depth="0.5" color="#FFFFFF">
+           <a-text id="txt-v-1" value="0" color="#000" align="center" width="20" position="0 0 0.3"></a-text>
+        </a-box>
+      </a-entity>
+
+      <a-entity position="0 8 30">
+        <a-torus radius="4" radius-tubular="0.2" color="#FF0000" rotation="20 180 0"></a-torus>
+        <a-box position="0 6 0" width="3" height="2" depth="0.5" color="#FFFFFF">
+           <a-text id="txt-v-2" value="0" color="#000" align="center" width="20" position="0 0 0.3"></a-text>
+        </a-box>
+      </a-entity>
+
+      <a-entity position="-5 1.5 -3" class="clickable" onclick="window.location.href='mundo3.html'">
+        <a-torus radius="0.8" radius-tubular="0.05" color="#FF1493"></a-torus>
+        <a-text value="VOLVER" align="center" color="#FF1493" position="0 0 0"></a-text>
+      </a-entity>
+
+      <a-entity id="rig" movement-controls="fly: true; speed: 0.3" wasd-controls="fly: true; acceleration: 60">
+        <a-entity camera position="0 1.6 0" look-controls></a-entity>
+        
+        <a-entity oculus-touch-controls="hand: left"></a-entity>
+        
+        <a-entity oculus-touch-controls="hand: right" sistema-basket>
+          <a-cursor color="#000" radius="0.01"></a-cursor>
+        </a-entity>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
