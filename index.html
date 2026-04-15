@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mundo 6 - Artico Final Multiplataforma</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    
+    <script>
+      window.pecesContador = 0;
+
+      AFRAME.registerComponent('cazar-pez', {
+        init: function () {
+          this.el.addEventListener('click', () => {
+            window.pecesContador++;
+            document.getElementById('marcador').setAttribute('value', 'Peces: ' + window.pecesContador);
+            if (window.pecesContador >= 10) {
+              document.getElementById('geiser-cromado').setAttribute('visible', 'true');
+              document.getElementById('marcador').setAttribute('value', 'GEISER ACTIVADO');
+              document.getElementById('marcador').setAttribute('color', 'gold');
+            }
+            this.el.parentNode.removeChild(this.el);
+          });
+        }
+      });
+
+      AFRAME.registerComponent('generador-peces', {
+        init: function () {
+          setInterval(() => {
+            if (document.querySelectorAll('.pez-entidad').length < 15) {
+              let scene = document.querySelector('a-scene');
+              let p = document.createElement('a-entity');
+              p.setAttribute('class', 'pez-entidad clickable');
+              p.setAttribute('position', {x: (Math.random()-0.5)*20, y: 0.8, z: (Math.random()-0.5)*20 - 5});
+              p.setAttribute('cazar-pez', '');
+              p.innerHTML = `
+                <a-cone radius-bottom="0.1" height="0.15" color="silver" position="0.25 0 0" rotation="0 0 -90" scale="1 1 0.3"></a-cone>
+                <a-cylinder radius="0.1" height="0.4" color="silver" rotation="0 0 90" scale="1 1 0.3"></a-cylinder>
+                <a-cone radius-bottom="0.1" height="0.2" color="#444" position="-0.3 0 0" rotation="0 0 90" scale="1 1 0.2"></a-cone>
+              `;
+              scene.appendChild(p);
+            }
+          }, 2500);
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene generador-peces>
+      <a-assets>
+        <a-asset-item id="modelo-artico" src="ice_environment.glb"></a-asset-item>
+      </a-assets>
+
+      <a-entity gltf-model="#modelo-artico" position="0 -0.5 0" scale="0.5 0.5 0.5"></a-entity>
+
+      <a-sky color="#bde0fe"></a-sky>
+      <a-text id="marcador" value="Caza 10 peces" position="0 3 -5" color="#0077b6" align="center" width="8"></a-text>
+
+      <a-entity position="-15 2 0" rotation="0 90 0">
+        <a-torus radius="2" radius-tubular="0.05" color="red"></a-torus>
+        <a-circle radius="2" class="clickable" visible="false" onclick="window.location.href='index.html'"></a-circle>
+        <a-text value="VOLVER" align="center" position="0 2.5 0" color="red"></a-text>
+      </a-entity>
+
+      <a-entity position="15 2 0" rotation="0 -90 0">
+        <a-torus radius="2" radius-tubular="0.05" color="gold"></a-torus>
+        <a-circle radius="2" class="clickable" visible="false" onclick="window.location.href='mundo7.html'"></a-circle>
+        <a-text value="SIGUIENTE" align="center" position="0 2.5 0" color="gold"></a-text>
+      </a-entity>
+
+      <a-entity id="geiser-cromado" position="0 -0.4 -10" visible="false">
+        <a-cone color="white" radius-bottom="0.5" height="15" opacity="0.5"></a-cone>
+      </a-entity>
+
+      <a-entity id="rig" movement-controls="fly: true; speed: 0.3" wasd-controls="fly: true">
+        <a-entity camera position="0 1.6 0" look-controls>
+          <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
+          <a-cursor color="white" raycaster="objects: .clickable"></a-cursor>
+        </a-entity>
+        <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 30"></a-entity>
+        <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 30"></a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
