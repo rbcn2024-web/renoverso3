@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mundo 6 - Ártico Universal (PC + Quest)</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    
+    <script>
+      window.peces = 0;
+      AFRAME.registerComponent('cazar-pez', {
+        init: function () {
+          this.el.addEventListener('click', () => {
+            window.peces++;
+            const marcador = document.getElementById('marcador');
+            marcador.setAttribute('value', 'Peces: ' + window.peces + ' / 10'); // He puesto 10 para probar rápido
+            
+            this.el.setAttribute('visible', false);
+            this.el.parentNode.removeChild(this.el);
+
+            if (window.peces >= 10) {
+              marcador.setAttribute('value', '¡MISION CUMPLIDA! LA ORCA RUGE');
+              marcador.setAttribute('color', '#FF4500');
+              document.getElementById('chorro-orca').setAttribute('visible', 'true');
+            }
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+
+    <a-scene webxr="optionalFeatures: hit-test, planar-hand-tracking">
+      <a-assets>
+        <a-asset-item id="modelo-artico" src="ice_environment.glb"></a-asset-item>
+      </a-assets>
+
+      <a-entity gltf-model="#modelo-artico" position="0 0 0" scale="1 1 1"></a-entity>
+
+      <a-sky color="#bde0fe"></a-sky> <a-light type="ambient" color="#FFF" intensity="0.9"></a-light> <a-light type="directional" color="#FFF" intensity="1.2" position="-1 5 1"></a-light> <a-text id="marcador" value="Caza 10 peces alargados" position="0 3.5 -4" color="#0077b6" align="center" width="8"></a-text>
+
+      <a-entity id="chorro-orca" position="8 -0.5 -12" visible="false">
+         <a-cone color="white" radius-bottom="0.4" radius-top="0" height="15" opacity="0.8">
+           <a-animation attribute="scale" from="1 0.1 1" to="1 1 1" dur="1000" repeat="indefinite"></a-animation>
+         </a-cone>
+      </a-entity>
+
+      <a-entity position="-5 1.5 -2" onclick="window.location.href='index.html'">
+        <a-torus radius="1" radius-tubular="0.05" color="red"></a-torus>
+        <a-text value="VOLVER" align="center" position="0 1.5 0" width="4"></a-text>
+      </a-entity>
+
+      <a-entity position="5 1.5 -2" onclick="window.location.href='mundo7.html'">
+        <a-torus radius="1" radius-tubular="0.05" color="gold"></a-torus>
+        <a-text value="SIGUIENTE" align="center" position="0 1.5 0" width="4"></a-text>
+      </a-entity>
+
+      <a-cylinder cazar-pez position="2 0.3 -4" radius="0.03" height="0.4" color="silver" rotation="90 45 0" material="metalness: 1"></a-cylinder>
+      <a-cylinder cazar-pez position="-3 0.6 -7" radius="0.03" height="0.4" color="silver" rotation="90 -30 0" material="metalness: 1"></a-cylinder>
+      <a-cylinder cazar-pez position="5 0.1 -10" radius="0.03" height="0.4" color="silver" rotation="90 0 0" material="metalness: 1"></a-cylinder>
+
+      <a-entity id="rig" movement-controls="fly: true; speed: 0.3">
+        <a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true">
+          
+          <a-cursor 
+            id="cursor-universal"
+            color="#0077b6" 
+            event-set__mouseenter="_event: mouseenter; color: springgreen"
+            event-set__mouseleave="_event: mouseleave; color: #0077b6"
+            fuse="false">
+          </a-cursor>
+
+        </a-entity>
+        
+        <a-entity oculus-touch-controls="hand: left"></a-entity>
+        <a-entity oculus-touch-controls="hand: right"></a-entity>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
