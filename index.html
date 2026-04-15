@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mundo 6 - Ártico Cromático y Geométrico</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    
+    <script>
+      window.pecesContador = 0;
+
+      AFRAME.registerComponent('cazar-pez', {
+        init: function () {
+          this.el.addEventListener('click', () => {
+            window.pecesContador++;
+            document.getElementById('marcador').setAttribute('value', 'Peces: ' + window.pecesContador);
+            
+            // Sonido o efecto al cazar (opcional)
+            if (window.pecesContador >= 10) {
+              document.getElementById('geiser-cromado').setAttribute('visible', 'true');
+              document.getElementById('marcador').setAttribute('value', '¡MISION CUMPLIDA! GÉISER LIBERADO');
+              document.getElementById('marcador').setAttribute('color', 'gold');
+            }
+            this.el.parentNode.removeChild(this.el);
+          });
+        }
+      });
+
+      AFRAME.registerComponent('generador-peces', {
+        init: function () {
+          setInterval(() => {
+            let pecesActuales = document.querySelectorAll('.pez-entidad').length;
+            if (pecesActuales < 18) { this.crearPez(); }
+          }, 2500); // Un poco más rápido para llenar el agua
+        },
+        crearPez: function () {
+          let scene = document.querySelector('a-scene');
+          let nuevoPez = document.createElement('a-entity');
+          let x = (Math.random() - 0.5) * 25;
+          let y = 0.3 + (Math.random() * 0.8);
+          let z = (Math.random() - 0.5) * 25 - 5;
+          
+          nuevoPez.setAttribute('class', 'pez-entidad');
+          nuevoPez.setAttribute('position', {x: x, y: y, z: z});
+          nuevoPez.setAttribute('rotation', {x: 0, y: Math.random() * 360, z: 0});
+          nuevoPez.setAttribute('cazar-pez', '');
+
+          // PEZ GEOMÉTRICO MEJORADO (Cilindro + 2 Conos)
+          nuevoPez.innerHTML = `
+            <a-cylinder radius="0.1" height="0.4" color="silver" rotation="0 0 90" scale="1 1 0.3" material="metalness: 0.9; roughness: 0.2"></a-cylinder>
+            
+            <a-cone radius-bottom="0.1" height="0.15" color="silver" position="0.25 0 0" rotation="0 0 -90" scale="1 1 0.3" material="metalness: 0.9"></a-cone>
+            
+            <a-cone radius-bottom="0.1" height="0.25" color="#555" position="-0.3 0 0" rotation="0 0 90" scale="1 1 0.2"></a-cone>
+          `;
+          scene.appendChild(nuevoPez);
+        }
+      });
+    </script>
+  </head>
+  <body>
+
+    <a-scene generador-peces>
+      <a-assets>
+        <a-asset-item id="modelo-artico" src="ice_environment.glb"></a-asset-item>
+      </a-assets>
+
+      <a-entity gltf-model="#modelo-artico" position="0 -0.5 0"></a-entity>
+      <a-sky color="#bde0fe"></a-sky>
+      <a-light type="ambient" intensity="0.9"></a-light>
+      <a-light type="directional" intensity="1.2" position="-1 5 1"></a-light>
+
+      <a-text id="marcador" value="Caza 10 peces" position="0 4.2 -5" color="#0077b6" align="center" width="10"></a-text>
+
+      <a-entity position="-20 2 0" rotation="0 90 0">
+        <a-torus radius="2" radius-tubular="0.1" color="red"></a-torus>
+        <a-circle radius="2" visible="false" class="clickable" onclick="window.location.href='index.html'"></a-circle>
+        <a-text value="VOLVER" align="center" position="0 3 0" width="12" color="red"></a-text>
+      </a-entity>
+
+      <a-entity position="20 2 0" rotation="0 -90 0">
+        <a-torus radius="2" radius-tubular="0.1" color="gold"></a-torus>
+        <a-circle radius="2" visible="false" class="clickable" onclick="window.location.href='mundo7.html'"></a-circle>
+        <a-text value="SIGUIENTE" align="center" position="0 3 0" width="12" color="gold"></a-text>
+      </a-entity>
+
+      <a-entity id="geiser-cromado" position="0 -0.4 -12" visible="false">
+        
+        <a-cone color="white" radius-bottom="0.8" radius-top="0" height="20" opacity="0.4">
+          <a-animation attribute="scale" from="1 0.1 1" to="1.2 1 1.2" dur="1000" repeat="indefinite"></a-animation>
+        </a-cone>
+        
+        <a-cone color="#FF5733" radius-bottom="1.2" radius-top="0.1" height="18" position="0 -1 0" opacity="0.5" material="roughness: 0; emissive: red; emissiveIntensity: 0.3">
+          <a-animation attribute="scale" from="0.8 0.1 0.8" to="1.5 1 1.5" dur="900" repeat="indefinite"></a-animation>
+          <a-animation attribute="material.emissiveIntensity" from="0.3" to="0.8" dur="450" repeat="indefinite" direction="alternate"></a-animation>
+        </a-cone>
+        
+        <a-sphere color="white" radius="1.5" position="0 18 0" opacity="0.6" material="roughness: 1">
+          <a-animation attribute="position" from="0 15 0" to="0 21 0" dur="1500" repeat="indefinite" direction="alternate"></a-alternate>
+        </a-sphere>
+
+      </a-entity>
+
+      <a-entity id="rig" movement-controls="fly: true; speed: 0.35" wasd-controls="fly: true; acceleration: 80">
+        <a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true">
+          <a-cursor color="#0077b6"></a-cursor>
+        </a-entity>
+        <a-entity laser-controls="hand: right" raycaster="objects: .pez-entidad, .clickable; far: 30"></a-entity>
+        <a-entity laser-controls="hand: left" raycaster="objects: .pez-entidad, .clickable; far: 30"></a-entity>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
